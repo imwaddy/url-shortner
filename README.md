@@ -60,7 +60,7 @@ go run main.go
 
 App runs on:
 
-http://localhost:8080
+http://localhost:8081
 
 ------------------------------------------------------------------------
 
@@ -93,7 +93,7 @@ url-shortner
 
 Application will be available at:
 
-http://localhost:8080
+http://localhost:8081
 
 ------------------------------------------------------------------------
 
@@ -109,7 +109,7 @@ Request Body:
 
 Response:
 
-{ "short_url": "http://localhost:8080/abc123" }
+{ "short_url": "http://localhost:8081/abc123" }
 
 ------------------------------------------------------------------------
 
@@ -119,7 +119,7 @@ GET /{shortCode}
 
 Example:
 
-http://localhost:8080/abc123
+http://localhost:8081/abc123
 
 Redirects to the original URL.
 
