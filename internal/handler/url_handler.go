@@ -40,9 +40,10 @@ func (h *URLHandler) Shorten(c *gin.Context) {
 }
 
 func (h *URLHandler) Redirect(c *gin.Context) {
+	ctx := c.Request.Context()
 	code := c.Param("code")
 
-	original, err := h.service.Resolve(code)
+	original, err := h.service.Resolve(ctx, code)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "not found"})
 		return

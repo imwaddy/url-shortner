@@ -1,9 +1,11 @@
 package service
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/go-sql-driver/mysql"
+	"github.com/imwaddy/url-shortner/internal/logger"
 	"github.com/imwaddy/url-shortner/internal/repository"
 	"github.com/imwaddy/url-shortner/pkg/generator"
 )
@@ -30,14 +32,16 @@ func (s *URLService) Create(original string) (string, error) {
 			continue
 		}
 
+		logger.Errorf("Error while saving code %+v", err)
 		return "", err
 	}
 
+	logger.Errorf("could not generate unique short code")
 	return "", fmt.Errorf("could not generate unique short code")
 }
 
-func (s *URLService) Resolve(short string) (string, error) {
-	return s.repo.Get(short)
+func (s *URLService) Resolve(ctx context.Context, short string) (string, error) {
+	return s.repo.Get(ctx, short)
 }
 
 func isDuplicateError(err error) bool {

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/imwaddy/url-shortner/internal/logger"
 )
 
 func NewMySQL(user, pass, host, dbName string) (*sql.DB, error) {
@@ -25,7 +26,7 @@ func NewMySQL(user, pass, host, dbName string) (*sql.DB, error) {
 			}
 		}
 
-		fmt.Println("Waiting for MySQL...")
+		logger.Println("Waiting for MySQL...")
 		time.Sleep(3 * time.Second)
 	}
 
@@ -41,5 +42,9 @@ func AutoMigrate(db *sql.DB) error {
 	);`
 
 	_, err := db.Exec(query)
+	if err != nil {
+		logger.Errorf("Error while automigrate %+v", err)
+		return err
+	}
 	return err
 }

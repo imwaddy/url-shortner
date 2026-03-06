@@ -7,8 +7,10 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o app ./cmd/server
+RUN go build -ldflags="-s -w" -o app ./cmd/server
 
 EXPOSE 8080
+
+# ENV GIN_MODE=release
 
 CMD ["./app"]

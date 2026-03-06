@@ -8,6 +8,10 @@ services:
       MYSQL_DATABASE: shortner
     ports:
       - "3307:3306"
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
 
   app:
     build: .
@@ -15,8 +19,10 @@ services:
       - "8081:8080"
     depends_on:
       - mysql
+      - redis
     environment:
       DB_USER: root
       DB_PASS: root
       DB_HOST: mysql:3306
       DB_NAME: shortner
+      REDIS_ADDR: redis:6379

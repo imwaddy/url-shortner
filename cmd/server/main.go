@@ -4,15 +4,23 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
+	"github.com/imwaddy/url-shortner/internal/cache"
 	"github.com/imwaddy/url-shortner/internal/config"
 	"github.com/imwaddy/url-shortner/internal/db"
 	"github.com/imwaddy/url-shortner/internal/handler"
+	"github.com/imwaddy/url-shortner/internal/logger"
 	"github.com/imwaddy/url-shortner/internal/repository"
 	"github.com/imwaddy/url-shortner/internal/service"
 )
 
 func main() {
+	logger.Init()
+
+	logger.Println("server starting...")
+
 	cfg := config.Load()
+
+	cache := cache.NewRedisClient()
 
 	database, err := db.NewMySQL(cfg.DBUser, cfg.DBPass, cfg.DBHost, cfg.DBName)
 	if err != nil {
@@ -23,8 +31,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	repo := repository.NewURLRepository(database)
+	repo := repository.NewURLRepository(database, cache)
+
 	svc := service.NewURLService(repo)
+
 	h := handler.NewURLHandler(svc)
 
 	r := gin.Default()
