@@ -1,0 +1,7 @@
+.git
+.gitignore
+README.md
+k8s
+docker-compose.yml
+node_modules
+tmp
