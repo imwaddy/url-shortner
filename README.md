@@ -1,156 +1,202 @@
-# 🔗 URL Shortener (Go + MySQL + Docker)
+# 🔗 URL Shortener
 
-A production-ready URL Shortener built with:
+A scalable URL shortener service built with **Go**, using **Redis for caching** and **MySQL for persistence**.  
+The application is containerized with **Docker** and can be deployed locally using **Kubernetes**. 🚀
 
--   Go (Golang)
--   MySQL
--   Docker
--   REST APIs
-
-------------------------------------------------------------------------
-
-## 📌 Features
-
--   Create short URLs
--   Redirect to original URL
--   MySQL persistent storage
--   Auto database migration
--   Dockerized setup
--   Environment variable configuration
-
-------------------------------------------------------------------------
+---
 
 ## 🏗 Architecture
 
-Client → API (Go App) → MySQL Database
+```
+Client
+   |
+   v
+Go API (Gin)
+   |
+   +---- Redis (Cache)
+   |
+   +---- MySQL (Persistent Storage)
+```
 
-------------------------------------------------------------------------
+### 🔄 Flow
+
+1. User sends a URL to shorten. 🌐
+2. Service generates a short code. 🔑
+3. URL is stored in **MySQL**. 🗄
+4. Frequently accessed URLs are cached in **Redis**. ⚡
+5. When the short URL is requested:
+   - Check Redis first. ⚡
+   - If not present → fetch from MySQL → update Redis. 🔁
+
+---
+
+## 🛠 Tech Stack
+
+- **Go** 🐹
+- **Gin Web Framework** 🌿
+- **MySQL** 🗄
+- **Redis** ⚡
+- **Docker** 🐳
+- **Kubernetes** ☸️
+
+---
 
 ## 📁 Project Structure
 
-. 
-├── main.go 
-├── handlers/ 
-├── models/ 
-├── config/ 
-├── Dockerfile 
-├── docker-compose.yml 
-├── README.md
-
-------------------------------------------------------------------------
-
-# 🚀 Getting Started
-
-## 1️⃣ Run Locally (Without Docker)
-
-### Create Database
-
-CREATE DATABASE shortner;
-
-### Set Environment Variables
-
-export DB_USER=root\
-export DB_PASS=root\
-export DB_HOST=localhost:3306\
-export DB_NAME=shortner
-
-### Run Application
-
-go run main.go
-
-App runs on:
-
-http://localhost:8081
-
-------------------------------------------------------------------------
-
-# 🐳 Run with Docker
-
-## Build Image
-
-docker build -t url-shortner .
-
-## Run MySQL Container
-
-docker run -d\
---name mysql\
--e MYSQL_ROOT_PASSWORD=root\
--e MYSQL_DATABASE=shortner\
--p 3306:3306\
-mysql:8
-
-## Run App Container
-
-docker run -d\
---name app\
---link mysql:mysql\
--p 8080:8080\
--e DB_USER=root\
--e DB_PASS=root\
--e DB_HOST=mysql:3306\
--e DB_NAME=shortner\
+```
 url-shortner
+│
+├── cmd/
+│   └── main.go
+│
+├── internal/
+│   ├── handler/
+│   ├── service/
+│   ├── repository/
+│   └── model/
+│
+├── pkg/
+│   ├── generator/
+│
+├── k8s/
+│
+├── Dockerfile
+└── README.md
+```
 
-Application will be available at:
+---
 
-http://localhost:8081
+## 🐳 Running Locally (Docker)
 
-------------------------------------------------------------------------
+Build the image:
 
-# 🔌 API Endpoints
+```bash
+docker build -t url-shortner .
+```
 
-## 1️⃣ Create Short URL
+Run the container:
 
-POST /shorten
+```bash
+docker run -p 8080:8080 url-shortner
+```
 
-Request Body:
+---
 
-{ "url": "https://google.com" }
+## ☸️ Running with Kubernetes
 
-Response:
+Apply the resources:
 
-{ "short_url": "http://localhost:8081/abc123" }
+```bash
+kubectl apply -f k8s/mysql.yaml
+kubectl apply -f k8s/redis.yaml
+kubectl apply -f k8s/url-shortner.yaml
+```
 
-------------------------------------------------------------------------
+Check running resources:
 
-## 2️⃣ Redirect
+```bash
+kubectl get pods
+kubectl get svc
+```
 
-GET /{shortCode}
+Example output:
+
+```
+NAME           TYPE        PORT(S)
+mysql          ClusterIP   3306
+redis          ClusterIP   6379
+url-shortner   NodePort    80:31639
+```
+
+---
+
+## 🌍 Access the Service
+
+Use the NodePort exposed by Kubernetes:
+
+```bash
+curl http://localhost:31639/<short-code>
+```
 
 Example:
 
-http://localhost:8081/abc123
+```bash
+curl http://localhost:31639/YwNMMv
+```
 
-Redirects to the original URL.
+---
 
-------------------------------------------------------------------------
+## 📡 API
 
-# ⚙️ Environment Variables
+### ✂️ Create Short URL
 
-DB_USER - Database username\
-DB_PASS - Database password\
-DB_HOST - Database host\
-DB_NAME - Database name
+```
+POST /shorten
+```
 
-------------------------------------------------------------------------
+Body:
 
-# 🧠 Future Improvements
+```json
+{
+  "url": "https://example.com"
+}
+```
 
--   Kubernetes deployment
--   Persistent storage setup
--   Secrets management
--   Rate Limiting
--   Analytics tracking
--   Redis caching
--   JWT authentication
+Response:
 
-------------------------------------------------------------------------
+```json
+{
+  "short": "abc123"
+}
+```
 
-# 👨‍💻 Author
+---
 
-Mayur Wadekar
+### 🔁 Redirect to Original URL
 
-------------------------------------------------------------------------
+```
+GET /{short_code}
+```
+
+Example:
+
+```
+GET "http://localhost:31639/abc123"
+```
+
+Response: **HTTP 302 Redirect** ↪️
+
+---
+
+## ✨ Features
+
+- URL shortening 🔗
+- Redirect using short code ↪️
+- Redis caching layer ⚡
+- MySQL persistent storage 🗄
+- Docker containerization 🐳
+- Kubernetes deployment ☸️
+
+---
+
+## 🚀 Future Improvements
+
+- Analytics for URL clicks 📊
+- Rate limiting 🚦
+- Expiration for short URLs ⏳
+- Custom aliases 🏷
+- Distributed ID generation ⚙️
+
+---
+
+## 👨‍💻 Author
+
+**Mayur Wadekar**
+
+GitHub:  
+https://github.com/imwaddy
+
+---
 
 # 📜 License
 
