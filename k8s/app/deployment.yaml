@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: url-shortner
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: url-shortner
@@ -15,7 +15,7 @@ spec:
       containers:
       - name: url-shortner
         image: url-shortner:latest
-        imagePullPolicy: Never
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
 
