@@ -174,12 +174,6 @@ docker build -t url-shortner .
 docker buildx build --load -t url-shortner:latest .
 ```
 
-Run the container:
-
-```bash
-docker run -p 8080:8080 url-shortner
-```
-
 ---
 
 ## ☸️ Running with Kubernetes
@@ -231,14 +225,14 @@ curl http://localhost:31639/YwNMMv
 ### ✂️ Create Short URL
 
 ```
-POST /shorten
+POST http://localhost:31639/api/v1/shorten
 ```
 
 Body:
 
 ```json
 {
-  "url": "https://example.com"
+  "url": "https://google.com"
 }
 ```
 
@@ -246,7 +240,9 @@ Response:
 
 ```json
 {
-  "short": "abc123"
+   "short_code": "GagPO2",
+   "short_url": "http://localhost:8080/GagPO2",
+   "original_url": "https://google.com"
 }
 ```
 
@@ -255,7 +251,7 @@ Response:
 ### 🔁 Redirect to Original URL
 
 ```
-GET /{short_code}
+GET http://localhost:31639/api/v1/{short_code}
 ```
 
 Example:
@@ -265,6 +261,22 @@ GET "http://localhost:31639/abc123"
 ```
 
 Response: **HTTP 302 Redirect** ↪️
+
+---
+
+### 🚦 Health Check
+
+```
+GET http://localhost:31639/health
+```
+
+Response:
+```
+{
+    "service": "url-shortener",
+    "status": "healthy"
+}
+```
 
 ---
 
