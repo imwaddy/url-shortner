@@ -168,6 +168,12 @@ Build the image:
 docker build -t url-shortner .
 ```
 
+**NOTE for docker desktop users:** If you encountered the image pull issues in Kubernetes, use buildx:
+
+```bash
+docker buildx build --load -t url-shortner:latest .
+```
+
 Run the container:
 
 ```bash
