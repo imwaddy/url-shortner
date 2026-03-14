@@ -1,7 +1,32 @@
 # 🔗 URL Shortener
 
 A scalable URL shortener service built with **Go**, using **Redis for caching** and **MySQL for persistence**.  
-The application is containerized with **Docker** and can be deployed locally using **Kubernetes**. 🚀
+The ## 🐳 Running Locally (Docker)
+
+### Using Docker
+
+Build the image:
+
+```bash
+docker build -t url-shortener .
+```
+
+Run the container:
+
+```bash
+docker run -p 8080:8080 \
+  -e DB_USER=root \
+  -e DB_PASS=password \
+  -e DB_HOST=mysql:3306 \
+  -e DB_NAME=urlshortener \
+  url-shortener
+```
+
+### Using Docker Compose (Recommended)
+
+```bash
+docker-compose up -d
+```s containerized with **Docker** and can be deployed locally using **Kubernetes**. 🚀
 
 ---
 
@@ -44,29 +69,98 @@ Go API (Gin)
 ## 📁 Project Structure
 
 ```
-url-shortner
+url-shortener/
 │
 ├── cmd/
-│   └── main.go
+│   └── server/
+│       └── main.go              # Application entry point
 │
-├── internal/
-│   ├── handler/
-│   ├── service/
-│   ├── repository/
-│   └── model/
+├── handler/
+│   └── url.go                   # HTTP request handlers
 │
-├── pkg/
-│   ├── generator/
+├── service/
+│   └── url.go                   # Business logic layer
 │
-├── k8s/
+├── repository/
+│   └── url.go                   # Data access layer
+│
+├── config/
+│   └── config.go                # Configuration management
+│
+├── pkg/                         # Shared utilities
+│   ├── database/
+│   │   └── mysql.go            # MySQL connection
+│   ├── cache/
+│   │   └── redis.go            # Redis client
+│   ├── logger/
+│   │   └── logger.go           # Logging utility
+│   └── shortener/
+│       └── generator.go        # Short code generator
+│
+├── k8s/                         # Kubernetes manifests
+│   ├── app/
+│   ├── mysql/
+│   └── redis/
 │
 ├── Dockerfile
+├── go.mod
 └── README.md
 ```
 
+### 🏛️ Architecture Principles
+
+- **Clean separation of concerns** - handler → service → repository
+- **Simplified structure** - removed unnecessary `internal/` nesting
+- **Reusable utilities** - shared packages in `pkg/`
+- **Easy navigation** - flat structure for better developer experience
+
 ---
 
-## 🐳 Running Locally (Docker)
+## � Getting Started
+
+### Prerequisites
+
+- Go 1.24+ 🐹
+- Docker & Docker Compose 🐳
+- kubectl (for Kubernetes deployment) ☸️
+- MySQL 8.0+ 🗄
+- Redis 6.0+ ⚡
+
+### Environment Variables
+
+Create a `.env` file or set these environment variables:
+
+```bash
+PORT=8080
+DB_USER=root
+DB_PASS=password
+DB_HOST=localhost:3306
+DB_NAME=urlshortener
+REDIS_ADDR=localhost:6379
+```
+
+### Local Development
+
+1. **Install dependencies:**
+   ```bash
+   go mod download
+   ```
+
+2. **Run MySQL and Redis:**
+   ```bash
+   docker-compose up -d mysql redis
+   ```
+
+3. **Run the application:**
+   ```bash
+   go run cmd/server/main.go
+   ```
+
+The service will be available at `http://localhost:8080`
+
+---
+
+## �🐳 Running Locally (Docker)
 
 Build the image:
 
