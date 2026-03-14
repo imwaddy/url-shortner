@@ -160,9 +160,9 @@ docker buildx build --load -t url-shortner:latest .
 Apply the resources:
 
 ```bash
-kubectl apply -f k8s/mysql.yaml
-kubectl apply -f k8s/redis.yaml
-kubectl apply -f k8s/url-shortner.yaml
+kubectl apply -f k8s/mysql -R
+kubectl apply -f k8s/redis  -R
+kubectl apply -f k8s/app -R
 ```
 
 Check running resources:
