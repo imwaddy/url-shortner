@@ -1,4 +1,4 @@
-name: Auto Release
+name: Semantic Release
 
 on:
   push:
@@ -13,40 +13,35 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Get latest tag
-        id: tag
+      - name: Get latest version
+        id: get_tag
         run: |
           TAG=$(git tag --sort=-v:refname | head -n 1)
+
           if [ -z "$TAG" ]; then
-            TAG="v0.0.0"
+            TAG="v1.0.0"
+          else
+            VERSION=${TAG#v}
+            IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+            PATCH=$((PATCH+1))
+            TAG="v$MAJOR.$MINOR.$PATCH"
           fi
+
           echo "tag=$TAG" >> $GITHUB_OUTPUT
 
-      - name: Increment version
-        id: version
+      - name: Create Tag
         run: |
-          TAG=${{ steps.tag.outputs.tag }}
-          VERSION=${TAG#v}
+          git tag ${{ steps.get_tag.outputs.tag }}
+          git push origin ${{ steps.get_tag.outputs.tag }}
 
-          IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
-          PATCH=$((PATCH+1))
-
-          NEW_TAG="v$MAJOR.$MINOR.$PATCH"
-          echo "new_tag=$NEW_TAG" >> $GITHUB_OUTPUT
-
-      - name: Create Git Tag
-        run: |
-          git tag ${{ steps.version.outputs.new_tag }}
-          git push origin ${{ steps.version.outputs.new_tag }}
-
-      - name: Create GitHub Release
+      - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.version.outputs.new_tag }}
-          name: Release ${{ steps.version.outputs.new_tag }}
+          tag_name: ${{ steps.get_tag.outputs.tag }}
+          name: ${{ steps.get_tag.outputs.tag }}
           generate_release_notes: true
