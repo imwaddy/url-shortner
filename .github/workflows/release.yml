@@ -1,9 +1,7 @@
-name: Release
+name: Auto Release
 
 on:
   push:
-    tags:
-      - 'v*.*.*'
     branches:
       - main
 
@@ -12,24 +10,43 @@ permissions:
 
 jobs:
   release:
-    name: Create Release
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Generate version
+      - name: Get latest tag
+        id: tag
+        run: |
+          TAG=$(git tag --sort=-v:refname | head -n 1)
+          if [ -z "$TAG" ]; then
+            TAG="v0.0.0"
+          fi
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+      - name: Increment version
         id: version
         run: |
-          VERSION=v$(date +'%Y.%m.%d.%H%M')
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          TAG=${{ steps.tag.outputs.tag }}
+          VERSION=${TAG#v}
+
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+          PATCH=$((PATCH+1))
+
+          NEW_TAG="v$MAJOR.$MINOR.$PATCH"
+          echo "new_tag=$NEW_TAG" >> $GITHUB_OUTPUT
+
+      - name: Create Git Tag
+        run: |
+          git tag ${{ steps.version.outputs.new_tag }}
+          git push origin ${{ steps.version.outputs.new_tag }}
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.version.outputs.version }}
-          name: Release ${{ steps.version.outputs.version }}
+          tag_name: ${{ steps.version.outputs.new_tag }}
+          name: Release ${{ steps.version.outputs.new_tag }}
           generate_release_notes: true
-          draft: false
-          prerelease: false
