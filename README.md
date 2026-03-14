@@ -22,14 +22,6 @@ docker run -p 8080:8080 \
   url-shortener
 ```
 
-### Using Docker Compose (Recommended)
-
-```bash
-docker-compose up -d
-```s containerized with **Docker** and can be deployed locally using **Kubernetes**. 🚀
-
----
-
 ## 🏗 Architecture
 
 ```
@@ -145,19 +137,6 @@ REDIS_ADDR=localhost:6379
    ```bash
    go mod download
    ```
-
-2. **Run MySQL and Redis:**
-   ```bash
-   docker-compose up -d mysql redis
-   ```
-
-3. **Run the application:**
-   ```bash
-   go run cmd/server/main.go
-   ```
-
-The service will be available at `http://localhost:8080`
-
 ---
 
 ## �🐳 Running Locally (Docker)
